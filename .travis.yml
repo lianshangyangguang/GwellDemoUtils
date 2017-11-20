@@ -19,7 +19,7 @@
     deploy:
       provider: releases
       api_key:
-        secure: SHA256:QkIVk9oLkiBcgX4WgaDUScOAJRWnBKI7DvLKvBnHi3M “test@gmail.com”
+        secure: QkIVk9oLkiBcgX4WgaDUScOAJRWnBKI7DvLKvBnHi3M “test@gmail.com”
       file: app/build/outputs/apk/app-release.apk
       skip_cleanup: true
       on:
