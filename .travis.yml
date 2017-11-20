@@ -19,7 +19,7 @@
     deploy:
       provider: releases
       api_key:
-        secure: 3CanRLnSjzJnj+BkgAMe0ieSTj1TMS77Ex4dC+7xuPw
+        secure: SHA256:3CanRLnSjzJnj+BkgAMe0ieSTj1TMS77Ex4dC+7xuPw “1141179268@qq.com
       file: app/build/outputs/apk/app-release.apk
       skip_cleanup: true
       on:
