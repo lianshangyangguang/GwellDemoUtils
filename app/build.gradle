@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'org.greenrobot.greendao' // apply plugin
 apply plugin: 'org.quanqi.pgyer'
-//apply plugin: 'im.fir.plugin.gradle'
+apply plugin: 'im.fir.plugin.gradle'
 apply plugin: 'com.neenbedankt.android-apt'
 
 android {
@@ -20,69 +20,51 @@ android {
     }
 
     signingConfigs {
-        releaseConfig {
-            storeFile file("../../test.jks")//指定密钥文件的路径
-            storePassword project.hasProperty("123456") ? KEYSTORE_PASS : System.getenv("KEYSTORE_PASS")//指定密钥参数
-            keyAlias project.hasProperty("test") ? ALIAS_NAME : System.getenv("ALIAS_NAME")
-            keyPassword project.hasProperty("123456") ? ALIAS_PASS : System.getenv("ALIAS_PASS")
+        release {
+            // default keystore file, PLZ config file path in local.properties
+            Properties properties = new Properties()
+            //加载本地local.properties文件
+            if (rootProject.file('local.properties').exists()) {
+                properties.load(rootProject.file("local.properties").newDataInputStream())
+                if(properties.get("storeFile")!=null){
+                    storeFile file(properties.get("storeFile"))
+                    storePassword properties.get("storePassword")
+                    keyAlias properties.get("keyAlias")
+                    keyPassword properties.get("keyPassword")
+                }
+            }else if(System.getenv("FLOW_CERTIFICATE_FILE")!=null){
+                storeFile file(System.getenv("FLOW_CERTIFICATE_FILE"))
+                storePassword System.getenv("FLOW_KEYSTORE_PASS")
+                keyAlias System.getenv("FLOW_ALIAS_NAME")
+                keyPassword System.getenv("FLOW_ALIAS_PASS")
+            }
         }
     }
+
+    fir{
+        //必填 上传 fir.im apk 字段，否则无法上传 APP 到 fir.im
+//        apiToken'58e870036c7798894efce2037c563ab6'
+        apiToken'8f68d31a204da27bfcc3747fa11dcbb6'
+        //可选 上传fir.im 中显示的changelog
+        changeLog '日志测试'
+    }
+
     buildTypes {
+        debug {
+            minifyEnabled false
+            //对齐优化设置为true，否则找不到该task (默认不写也是true)
+            zipAlignEnabled true
+        }
         release {
             minifyEnabled false
+            zipAlignEnabled true
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.releaseConfig//注意这一行
+            //对齐优化设置为true，否则找不到该task (默认不写也是true)
+            zipAlignEnabled true
         }
+
     }
-
-
-
-//    signingConfigs {
-//        release {
-//            // default keystore file, PLZ config file path in local.properties
-//            Properties properties = new Properties()
-//            //加载本地local.properties文件
-//            if (rootProject.file('local.properties').exists()) {
-//                properties.load(rootProject.file("local.properties").newDataInputStream())
-//                if(properties.get("storeFile")!=null){
-//                    storeFile file(properties.get("storeFile"))
-//                    storePassword properties.get("storePassword")
-//                    keyAlias properties.get("keyAlias")
-//                    keyPassword properties.get("keyPassword")
-//                }
-//            }else if(System.getenv("FLOW_CERTIFICATE_FILE")!=null){
-//                storeFile file(System.getenv("FLOW_CERTIFICATE_FILE"))
-//                storePassword System.getenv("FLOW_KEYSTORE_PASS")
-//                keyAlias System.getenv("FLOW_ALIAS_NAME")
-//                keyPassword System.getenv("FLOW_ALIAS_PASS")
-//            }
-//        }
-//    }
-
-//    fir{
-//        //必填 上传 fir.im apk 字段，否则无法上传 APP 到 fir.im
-////        apiToken'58e870036c7798894efce2037c563ab6'
-//        apiToken'8f68d31a204da27bfcc3747fa11dcbb6'
-//        //可选 上传fir.im 中显示的changelog
-//        changeLog '日志测试'
-//    }
-
-//    buildTypes {
-//        debug {
-//            minifyEnabled false
-//            //对齐优化设置为true，否则找不到该task (默认不写也是true)
-//            zipAlignEnabled true
-//        }
-//        release {
-//            minifyEnabled false
-//            zipAlignEnabled true
-//            signingConfig signingConfigs.release
-//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-//            //对齐优化设置为true，否则找不到该task (默认不写也是true)
-//            zipAlignEnabled true
-//        }
-//
-//    }
 
     packagingOptions {
         exclude 'META-INF/rxjava.properties'
@@ -109,7 +91,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.2.0'
     compile 'me.drakeet.multitype:multitype:2.2.2'
     compile 'com.android.support:design:25.2.0'
-    //    compile 'com.jakewharton:butterknife:8.5.1'
+//    compile 'com.jakewharton:butterknife:8.5.1'
     compile 'com.jakewharton:butterknife:8.0.1'
     apt 'com.jakewharton:butterknife-compiler:8.0.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
@@ -141,9 +123,7 @@ dependencies {
     compile 'com.aliyun.ams:alicloud-android-push:3.0.9@aar'
     compile 'com.aliyun.ams:alicloud-android-utdid:1.1.5.3'
     compile 'com.aliyun.ams:alicloud-android-ut:5.0.0'
-    compile files('libs/Bughd_android_sdk_v1.3.7.jar')
 }
-
 //
 //pgyer {
 //    _api_key = "f5ac7a2760e7f61e74c142a43828ba13"
@@ -156,4 +136,3 @@ dependencies {
 //    }
 //
 //}
-
